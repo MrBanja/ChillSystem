@@ -47,9 +47,9 @@ async def t_bot_clear_youtube_urls_from_queue(msg: MessageModel):
         await bot.send_message(f'Queue cleared!', msg.chat.id)
 
 
-@bot.process_command(command='default')
-async def t_bot_test(msg: MessageModel):
-    await bot.send_message('Unknown command', chat_id=msg.chat.id)
+async def t_bot_unknown_command(update: UpdateModel):
+    # FIXME: Message could not be in update.
+    await bot.send_message('Unknown command', chat_id=update.message.chat.id)
 
 
 @router.on_event("startup")
@@ -71,4 +71,4 @@ async def t_bot_delete_web_hook():
 )
 async def web_hook(update_request: UpdateModel):
     pprint(update_request.dict(exclude_none=True))
-    asyncio.create_task(bot.update_handler(update_request))
+    asyncio.create_task(bot.update_handler(update_request, default=t_bot_unknown_command))

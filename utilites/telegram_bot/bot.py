@@ -3,7 +3,7 @@ import asyncio
 
 import aiohttp
 
-from typing import Optional, Union, Callable, Dict
+from typing import Optional, Union, Callable, Dict, Any, Awaitable
 
 from pydantic import BaseModel
 
@@ -62,7 +62,11 @@ class TBot:
 
         return decorator
 
-    async def update_handler(self, update: UpdateModel):
+    async def update_handler(
+            self,
+            update: UpdateModel,
+            default: Optional[Callable[[UpdateModel], Awaitable[Any]]] = None,
+    ):
         if update.message is None:
             # TODO: Log no message
             return
@@ -80,6 +84,9 @@ class TBot:
             if regex.match(update.message.text):
                 asyncio.create_task(function(update.message))
                 return
+
+        if default is not None:
+            await default(update)
 
     async def send_message(self, text: str, chat_id: Union[str, int]):
         # TODO: Extend for more sendMessageModel field

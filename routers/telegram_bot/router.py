@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends
 from routers.telegram_bot.dependencies import verify_telegram_bot_token
 from utilites.telegram_bot.data_models import UpdateModel, MessageModel
 from utilites.telegram_bot.bot import TBot
+from utilites.redis_util import create_redis_pool, Redis
 
 
 router = APIRouter()
@@ -16,8 +17,34 @@ bot = TBot(token=config.settings.telegram_bot_token)
 
 
 @bot.process_command(regex=r'^(https://)?(www.)?(youtu.be|youtube.com)')
-async def t_bot_youtube_url(msg: MessageModel):
-    await bot.send_message('Nice video, bro!', chat_id=msg.chat.id)
+async def t_bot_add_youtube_url_to_queue(msg: MessageModel):
+    async with create_redis_pool() as redis:
+        redis: Redis
+
+        res = await redis.lpush(msg.from_.id, msg.text)
+
+        await bot.send_message(f'Nice video, bro! {res} videos in queue', chat_id=msg.chat.id)
+
+
+@bot.process_command(command='list')
+async def t_bot_get_youtube_urls_from_queue(msg: MessageModel):
+    async with create_redis_pool() as redis:
+        redis: Redis
+
+        queue_len = await redis.llen(msg.from_.id)
+        resp = await redis.lrange(msg.from_.id, 0, queue_len, encoding='utf-8')
+
+        await bot.send_message(f'{resp}', msg.chat.id)
+
+
+@bot.process_command(command='clear')
+async def t_bot_clear_youtube_urls_from_queue(msg: MessageModel):
+    async with create_redis_pool() as redis:
+        redis: Redis
+
+        resp = await redis.delete(msg.from_.id)
+
+        await bot.send_message(f'Queue cleared! {resp}', msg.chat.id)
 
 
 @bot.process_command(command='default')

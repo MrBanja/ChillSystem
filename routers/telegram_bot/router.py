@@ -44,7 +44,7 @@ async def t_bot_clear_youtube_urls_from_queue(msg: MessageModel):
 
         resp = await redis.delete(msg.from_.id)
 
-        await bot.send_message(f'Queue cleared! {resp}', msg.chat.id)
+        await bot.send_message(f'Queue cleared!', msg.chat.id)
 
 
 @bot.process_command(command='default')

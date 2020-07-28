@@ -18,6 +18,11 @@ bot = TBot(token=config.settings.telegram_bot_token)
 
 @bot.process_command(regex=r'^(https://)?(www.)?(youtu.be|youtube.com)')
 async def t_bot_add_youtube_url_to_queue(msg: MessageModel):
+    """
+    Handle youtube video urls sent to bot.
+
+    Add video url to user's queue.
+    """
     async with create_redis_pool() as redis:
         redis: Redis
 
@@ -28,6 +33,11 @@ async def t_bot_add_youtube_url_to_queue(msg: MessageModel):
 
 @bot.process_command(command='list')
 async def t_bot_get_youtube_urls_from_queue(msg: MessageModel):
+    """
+    Handle `/list` bot command.
+
+    Show all youtube videos queue for user.
+    """
     async with create_redis_pool() as redis:
         redis: Redis
 
@@ -39,6 +49,11 @@ async def t_bot_get_youtube_urls_from_queue(msg: MessageModel):
 
 @bot.process_command(command='clear')
 async def t_bot_clear_youtube_urls_from_queue(msg: MessageModel):
+    """
+    Handle `/clear` bot command.
+
+    Clear all youtube videos queue for user.
+    """
     async with create_redis_pool() as redis:
         redis: Redis
 
@@ -48,19 +63,30 @@ async def t_bot_clear_youtube_urls_from_queue(msg: MessageModel):
 
 
 async def t_bot_unknown_command(update: UpdateModel):
+    """Handle unknown message to the telegram bot."""
     # FIXME: Message could not be in update.
     await bot.send_message('Unknown command', chat_id=update.message.chat.id)
 
 
 @router.on_event("startup")
 async def t_bot_set_web_hook():
-    url = 'https://b50d45d27b05.ngrok.io'
+    """
+    Set telegram webHook on server startup.
+
+    Have sense only when testing with ngrok for example.
+    """
+    url = 'https://64220a7452c6.ngrok.io'
     url += f'/bot/{config.settings.telegram_bot_token}/webHook'
     print('SET WEBHOOK', await bot.set_web_hook(url))
 
 
 @router.on_event("shutdown")
 async def t_bot_delete_web_hook():
+    """
+    Delete telegram webHook on server shutdown.
+
+    Have sense only when testing with ngrok for example.
+    """
     print('DELETE WEBHOOK', await bot.delete_web_hook())
 
 
@@ -70,5 +96,6 @@ async def t_bot_delete_web_hook():
     include_in_schema=False,
 )
 async def web_hook(update_request: UpdateModel):
+    """Accept requests from telegram bot."""
     pprint(update_request.dict(exclude_none=True))
     asyncio.create_task(bot.update_handler(update_request, default=t_bot_unknown_command))

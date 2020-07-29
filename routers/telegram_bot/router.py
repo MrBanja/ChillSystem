@@ -96,7 +96,7 @@ async def t_bot_set_web_hook():
 
     Have sense only when testing with ngrok for example.
     """
-    url = 'https://64220a7452c6.ngrok.io'
+    url = config.settings.ngrok_tunnel_address
     url += f'/bot/{config.settings.telegram_bot_token}/webHook'
     print('SET WEBHOOK', await bot.set_web_hook(url))
 

@@ -26,7 +26,11 @@ async def t_bot_add_youtube_url_to_queue(msg: MessageModel):
     async with create_redis_pool() as redis:
         redis: Redis
 
-        res = await redis.lpush(msg.from_.id, msg.text)
+        # TODO: Add regex for fetching video id
+        video_id = msg.text[17:]
+        youtube_url = f'https://www.youtube.com/embed/{video_id}?autoplay=1'
+
+        res = await redis.lpush(msg.from_.id, youtube_url)
 
         await bot.send_message(f'Nice video, bro! {res} videos in queue', chat_id=msg.chat.id)
 
@@ -47,6 +51,23 @@ async def t_bot_get_youtube_urls_from_queue(msg: MessageModel):
         await bot.send_message(f'{resp}', msg.chat.id)
 
 
+@bot.process_command(command='skip')
+async def t_bot_skip_video(msg: MessageModel):
+    """
+    Handle `/skip` bot command.
+
+    Skip video to next one.
+    """
+    async with create_redis_pool() as redis:
+        redis: Redis
+        resp = await redis.lpop(msg.from_.id, encoding='utf-8')
+
+    if bot.is_websocket_for_user(msg.from_.id):
+        await bot.sent_text_to_websocket(resp, msg.from_.id)
+    else:
+        await bot.send_message('You are not at the site right now.', msg.chat.id)
+
+
 @bot.process_command(command='clear')
 async def t_bot_clear_youtube_urls_from_queue(msg: MessageModel):
     """
@@ -57,7 +78,7 @@ async def t_bot_clear_youtube_urls_from_queue(msg: MessageModel):
     async with create_redis_pool() as redis:
         redis: Redis
 
-        resp = await redis.delete(msg.from_.id)
+        await redis.delete(msg.from_.id)
 
         await bot.send_message(f'Queue cleared!', msg.chat.id)
 
@@ -75,7 +96,7 @@ async def t_bot_set_web_hook():
 
     Have sense only when testing with ngrok for example.
     """
-    url = 'https://64220a7452c6.ngrok.io'
+    url = config.settings.ngrok_tunnel_address
     url += f'/bot/{config.settings.telegram_bot_token}/webHook'
     print('SET WEBHOOK', await bot.set_web_hook(url))
 

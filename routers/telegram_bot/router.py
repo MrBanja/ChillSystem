@@ -26,7 +26,11 @@ async def t_bot_add_youtube_url_to_queue(msg: MessageModel):
     async with create_redis_pool() as redis:
         redis: Redis
 
-        res = await redis.lpush(msg.from_.id, msg.text)
+        # TODO: Add regex for fetching video id
+        video_id = msg.text[17:]
+        youtube_url = f'https://www.youtube.com/embed/{video_id}?autoplay=1'
+
+        res = await redis.lpush(msg.from_.id, youtube_url)
 
         await bot.send_message(f'Nice video, bro! {res} videos in queue', chat_id=msg.chat.id)
 

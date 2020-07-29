@@ -2,6 +2,7 @@
 
 ### Table of content
 * [About](#about)
+* [How to](#how-to)
 * [About technical details](#about-technical-details)
     * [Telegram Bot](#telegram-bot)
     * [Web service](#web-service)
@@ -9,7 +10,7 @@
 
 ## About
 
-It is a system for those how are lazy. 
+It is a system for those who are lazy. 
 Imagine, you have an old TV or a computer monitor. Your friend come to
 your party and you would like to watch some youtube videos with your
 pals. But the TV is old enough to support YouTube app (monitor can not 
@@ -21,6 +22,8 @@ to turn on or skip the video. Now you can use the special _telegram_ bot! Just s
 videos from mobile YouTube app to telegram bot. It will add to a queue them automatically
 and will play them for you on the web page you opened previously.
 
+## How to
+When MVP milestone will be added this section will be expanded.
 
 ## About Technical details
 

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat</title>
+</head>
+<body>
+<h1>Enter you telegram user id</h1>
+<form action="" onsubmit="connect(event)">
+    <input type="text" id="messageText" autocomplete="off"/>
+    <button>Send</button>
+</form>
+<iframe width="1000" height="700" id="yt_video"
+src="">
+</iframe>
+<ul id='messages'>
+</ul>
+<script>
+    function connect(event) {
+        let user_id = document.getElementById("messageText")
+        console.log(user_id.value)
+        let ws = new WebSocket("ws://localhost:8000/ws?user_id=" + user_id.value);
+
+        ws.onmessage = function(event) {
+            let messages = document.getElementById('yt_video')
+            messages.setAttribute('src', event.data)
+        };
+
+        event.preventDefault()
+    }
+</script>
+</body>
+</html>

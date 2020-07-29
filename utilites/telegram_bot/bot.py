@@ -6,6 +6,7 @@ import aiohttp
 from typing import Optional, Union, Callable, Dict, Any, Awaitable
 
 from pydantic import BaseModel
+from fastapi import WebSocket
 
 from utilites.telegram_bot.data_models import (
     UpdateModel,
@@ -24,6 +25,7 @@ class TBot:
         self._command_functions: Dict[str, Optional[Callable]] = {}
         self._regex_functions: Dict[re.Pattern, Optional[Callable]] = {}
         self._request_url_base_with_token = f'https://api.telegram.org/bot{token}/'
+        self._websocket: Dict[int, WebSocket] = {}
 
     async def _send_post_request(self, method_name: str, params: Optional[BaseModel] = None):
         """Send post request to telegram api given method."""
@@ -112,6 +114,21 @@ class TBot:
         """Set new bot webHook."""
         payload = SetWebHookModel(url=url)
         return await self._send_post_request('setWebhook', params=payload)
+
+    async def sent_text_to_websocket(self, text: str, user_id: int):
+        if self._websocket.get(user_id) is None:
+            raise AttributeError('Web socket was not attached.')
+
+        await self._websocket[user_id].send_text(text)
+
+    def is_websocket_for_user(self, user_id: int):
+        return user_id in self._websocket
+
+    def attach_websocket_to_user(self, user_id: int, websocket: WebSocket):
+        self._websocket[user_id] = websocket
+
+    def unattach_websocket_by_user_id(self, user_id: int):
+        del self._websocket[user_id]
 
 
 def _get_bot_command_from_message_entity(entity: MessageEntityModel, text: str):

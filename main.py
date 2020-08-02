@@ -32,7 +32,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
         redis: Redis
 
         while True:
-            video = await redis.lpop(user_id, encoding='utf-8')
+            video = await redis.rpop(user_id, encoding='utf-8')
 
             if video:
                 await websocket.send_text(f"{video}")

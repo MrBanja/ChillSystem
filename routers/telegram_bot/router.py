@@ -60,7 +60,7 @@ async def t_bot_skip_video(msg: MessageModel):
     """
     async with create_redis_pool() as redis:
         redis: Redis
-        resp = await redis.lpop(msg.from_.id, encoding='utf-8')
+        resp = await redis.rpop(msg.from_.id, encoding='utf-8')
 
     if bot.is_websocket_for_user(msg.from_.id):
         await bot.sent_text_to_websocket(resp, msg.from_.id)

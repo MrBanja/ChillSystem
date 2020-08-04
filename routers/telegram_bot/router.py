@@ -1,5 +1,10 @@
-import config
+"""Router for telegram bot handling."""
 import asyncio
+import json
+
+import aio_pika
+
+import config
 
 from pprint import pprint
 
@@ -58,14 +63,26 @@ async def t_bot_skip_video(msg: MessageModel):
 
     Skip video to next one.
     """
-    async with create_redis_pool() as redis:
-        redis: Redis
-        resp = await redis.rpop(msg.from_.id, encoding='utf-8')
+    connection = config.CONNECTIONS_TO_CLOSE.get('TBot')
+    if connection is None:
+        # TODO: log closed connection
+        pass
 
-    if bot.is_websocket_for_user(msg.from_.id):
-        await bot.sent_text_to_websocket(resp, msg.from_.id)
-    else:
-        await bot.send_message('You are not at the site right now.', msg.chat.id)
+    channel: aio_pika.Channel = await connection.channel()
+
+    websocket_exchange: aio_pika.Exchange = await channel.declare_exchange(
+        'WebSocket',
+        aio_pika.ExchangeType.DIRECT,
+    )
+
+    message_body = {
+        'from': msg.from_.id,
+        'command': config.WebSocketWorkerCommands.SKIP.value,
+    }
+    message_body_json_bytes = json.dumps(message_body).encode('utf-8')
+    message = aio_pika.Message(message_body_json_bytes, delivery_mode=aio_pika.DeliveryMode.PERSISTENT)
+
+    await websocket_exchange.publish(message, routing_key='bot-worker')
 
 
 @bot.process_command(command='clear')
@@ -80,7 +97,7 @@ async def t_bot_clear_youtube_urls_from_queue(msg: MessageModel):
 
         await redis.delete(msg.from_.id)
 
-        await bot.send_message(f'Queue cleared!', msg.chat.id)
+        await bot.send_message('Queue cleared!', msg.chat.id)
 
 
 async def t_bot_unknown_command(update: UpdateModel):
@@ -98,7 +115,10 @@ async def t_bot_set_web_hook():
     """
     url = config.settings.ngrok_tunnel_address
     url += f'/bot/{config.settings.telegram_bot_token}/webHook'
-    print('SET WEBHOOK', await bot.set_web_hook(url))
+    await bot.set_web_hook(url)
+
+    connection: aio_pika.Connection = await aio_pika.connect("amqp://guest:guest@localhost/")
+    config.CONNECTIONS_TO_CLOSE['TBot'] = connection
 
 
 @router.on_event("shutdown")
@@ -108,7 +128,7 @@ async def t_bot_delete_web_hook():
 
     Have sense only when testing with ngrok for example.
     """
-    print('DELETE WEBHOOK', await bot.delete_web_hook())
+    await bot.delete_web_hook()
 
 
 @router.post(

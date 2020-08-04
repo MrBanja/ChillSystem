@@ -1,9 +1,11 @@
+"""Worker for dispatching server/bot commands."""
 import asyncio
 
 import aio_pika
 
 
 async def on_message_to_rabbit_exchange(message: aio_pika.IncomingMessage):
+    """Route messages to server for additional handling."""
     async with message.process():
         print(f'Got message from {message.routing_key}')
         print(f'Message body {message.body}')
@@ -23,6 +25,7 @@ async def on_message_to_rabbit_exchange(message: aio_pika.IncomingMessage):
 
 
 async def main():
+    """Start worker."""
     connection: aio_pika.Connection = await aio_pika.connect_robust("amqp://guest:guest@localhost/")
 
     print('Connected')

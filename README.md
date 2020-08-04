@@ -30,7 +30,7 @@ When MVP milestone will be added this section will be expanded.
 This project currently contains telegram bot and a back-end web-service.
 
 **Stack that we are using now**: python3.8+, asyncio(lots of it), FastAPI(as main web-service),
-aiohttp(as Client side), Redis(for storing queues, planning to move to the RabbitMQ), Docker.
+aiohttp(as Client side), Redis(for storing video queues), RabbitMQ(for message queues), Docker.
 
 ### Telegram Bot
 

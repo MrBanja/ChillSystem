@@ -117,7 +117,7 @@ async def t_bot_set_web_hook():
     url += f'/bot/{config.settings.telegram_bot_token}/webHook'
     await bot.set_web_hook(url)
 
-    connection: aio_pika.Connection = await aio_pika.connect("amqp://guest:guest@localhost/")
+    connection: aio_pika.Connection = await aio_pika.connect(f"amqp://guest:guest@youtube_sitter_chill_rabbitmq_1/")
     config.CONNECTIONS_TO_CLOSE['TBot'] = connection
 
 

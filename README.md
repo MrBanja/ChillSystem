@@ -87,9 +87,9 @@ $ docker-compose up
 Since it is not even MVP we will be using [ngrok](https://ngrok.com/).
 
 For now in `.env` file should be:
-1. DEBUG="true"
-2. TELEGRAM_BOT_TOKEN="1270199434:AAG8QCJA7NEGkufFFPyj0YuhizP7p2mGBlE"
-3. NGROK_TUNNEL_ADDRESS="https://e99d10f31404.ngrok.io"
+1. DEBUG
+2. TELEGRAM_BOT_TOKEN
+3. NGROK_TUNNEL_ADDRESS
 
 ```shell script
 DEBUG="true"

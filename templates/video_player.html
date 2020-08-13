@@ -17,10 +17,10 @@ src="">
 <script>
     function connect(event) {
         let user_id = document.getElementById("messageText")
-        console.log(user_id.value)
-        let ws = new WebSocket("ws://localhost:8000/ws?user_id=" + user_id.value);
+        let ws = new WebSocket("ws://localhost:8000/webSocket/ws?user_id=" + user_id.value);
 
         ws.onmessage = function(event) {
+            console.log(event.data)
             let messages = document.getElementById('yt_video')
             messages.setAttribute('src', event.data)
         };

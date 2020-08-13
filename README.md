@@ -7,6 +7,8 @@
     * [Telegram Bot](#telegram-bot)
     * [Web service](#web-service)
 * [Deploy](#deploy)
+    * [Build](#build)
+    * [Dot env](#dot-env)
 
 ## About
 
@@ -49,12 +51,52 @@ Currently it handles webHook from telegram API and web socket connection with a 
 
 ## Deploy
 
-Currently its running with uvicorn ASGI.
+### Build
 
-In the nearest future will be created dockers images for Web-service with the bot
-and for Redis, which will be connected by the docker-compose.
+You new to have docker and docker-compose installed.
 
-When docker images will be created this section will be expanded.
+1. Create project dir named youtube_sitter;
+2. Create `app` folder in it;
+3. Clone this repo;
+4. Create `.env` file. About .env
+5. Run `create_project_tree.sh`;
+6. Go to `redis` directory;
+7. Open `redis.conf`;
+8. Make you own redis config file. (By default redis expose `6379` port. If you
+would like to change it, don't forget about `docker-compose.yml`. Also `daemonize` should be set
+to `no`);
+9. Go back to `youtube_sitter` dir;
+10. Run `docker-compose build`;
+11. Start your app `docker-compose up`.
+
+```shell script
+$ mkdir youtube_sitter
+$ mkdir app
+$ cd app
+$ git clone https://github.com/AngliD/ChillSystem
+$ vim .env
+$ ./create_project_tree.sh
+$ cd ../redis
+$ vim redis.conf
+$ cd ..
+$ docker-compose build
+$ docker-compose up
+```
+
+### Dot env
+Since it is not even MVP we will be using [ngrok](https://ngrok.com/).
+
+For now in `.env` file should be:
+1. DEBUG="true"
+2. TELEGRAM_BOT_TOKEN="1270199434:AAG8QCJA7NEGkufFFPyj0YuhizP7p2mGBlE"
+3. NGROK_TUNNEL_ADDRESS="https://e99d10f31404.ngrok.io"
+
+```shell script
+DEBUG="true"
+TELEGRAM_BOT_TOKEN="4523452345:TESTTESTTESTTESTTESTTESTTESTTEST"
+NGROK_TUNNEL_ADDRESS="https://testtesttest.ngrok.io"
+```
+
 
 
 ## Developers

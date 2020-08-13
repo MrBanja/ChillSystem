@@ -10,7 +10,7 @@ async def main():
     while count < 10:
         try:
             connection: aio_pika.Connection = await aio_pika.connect_robust(
-                "amqp://guest:guest@youtube_sitter_sitter-rabbitmq_1/")
+                "amqp://guest:guest@youtube_sitter_chill_rabbitmq_1/")
             await connection.close()
             print('Connected!!!')
             sys.exit()

@@ -10,7 +10,9 @@ async def on_message_to_rabbit_exchange(message: aio_pika.IncomingMessage):
         print(f'Got message from {message.routing_key}')
         print(f'Message body {message.body}')
 
-        connection: aio_pika.Connection = await aio_pika.connect("amqp://guest:guest@localhost/")
+        connection: aio_pika.Connection = await aio_pika.connect(
+            "amqp://guest:guest@youtube_sitter_sitter-rabbitmq_1//")
+
         channel: aio_pika.Channel = await connection.channel()
 
         websocket_exchange: aio_pika.Exchange = await channel.declare_exchange(
@@ -26,7 +28,8 @@ async def on_message_to_rabbit_exchange(message: aio_pika.IncomingMessage):
 
 async def main():
     """Start worker."""
-    connection: aio_pika.Connection = await aio_pika.connect_robust("amqp://guest:guest@localhost/")
+    connection: aio_pika.Connection = await aio_pika.connect(
+        "amqp://guest:guest@youtube_sitter_sitter-rabbitmq_1//")
 
     print('Connected')
 

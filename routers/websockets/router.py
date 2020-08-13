@@ -6,7 +6,7 @@ import aio_pika
 from fastapi import APIRouter, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
-from config import CONNECTED_WEBSOCKETS, TUserId, CONNECTIONS_TO_CLOSE
+from config import CONNECTED_WEBSOCKETS, TUserId, CONNECTIONS_TO_CLOSE, settings
 from routers.websockets.worker_utils import server_websocket_rabbit_consumer
 
 
@@ -39,7 +39,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
 @router.on_event('startup')
 async def startup_rabbit_listener():
     """Open RabbitMQ connection for server listener and launch demon consumer."""
-    connection: aio_pika.Connection = await aio_pika.connect("amqp://guest:guest@localhost/")
+    connection: aio_pika.Connection = await aio_pika.connect(f"amqp://guest:guest@youtube_sitter_sitter-rabbitmq_1/")
     CONNECTIONS_TO_CLOSE['server'] = connection
     asyncio.create_task(server_websocket_rabbit_consumer())
 

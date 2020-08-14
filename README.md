@@ -53,11 +53,11 @@ Currently it handles webHook from telegram API and web socket connection with a 
 
 ### Build
 
-You new to have docker and docker-compose installed.
+You need to have docker and docker-compose installed.
 
 1. Create project dir named youtube_sitter;
 2. Create `app` folder in it;
-3. Clone this repo;
+3. Clone this repo in the `app` folder;
 4. Create `.env` file. About .env
 5. Run `create_project_tree.sh`;
 6. Go to `redis` directory;
@@ -71,9 +71,10 @@ to `no`);
 
 ```shell script
 $ mkdir youtube_sitter
+$ cd youtube_sitter
 $ mkdir app
 $ cd app
-$ git clone https://github.com/AngliD/ChillSystem
+$ git clone https://github.com/AngliD/ChillSystem .
 $ vim .env
 $ ./create_project_tree.sh
 $ cd ../redis

@@ -5,6 +5,7 @@ ENV PYTHONUNBUFFERED 1
 COPY requirements.txt /etc/requirements.txt
 
 RUN mkdir /app
+RUN mkdir /app/logs
 WORKDIR /app
 COPY . /app
 

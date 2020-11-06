@@ -1,6 +1,7 @@
 """Server-wide configurations."""
 import enum
 import pathlib
+import logging
 
 import aio_pika
 
@@ -13,7 +14,7 @@ TUserId = NewType('TUserId', int)
 BASE_DIR = pathlib.Path('.').parent.resolve()
 
 CONNECTED_WEBSOCKETS: Dict[TUserId, WebSocket] = {}
-CONNECTIONS_TO_CLOSE: Dict[str, aio_pika.Connection] = {}
+MQ_CONNECTIONS: Dict[str, aio_pika.Connection] = {}
 
 
 class WebSocketWorkerCommands(enum.Enum):
@@ -37,3 +38,57 @@ class Settings(BaseSettings):
 
 
 settings = Settings()
+
+
+LOGGING_CONFIG = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'default': {
+            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+        },
+    },
+    'handlers': {
+        'routers': {
+            'level': logging.INFO,
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': './logs/routers.log',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 10,
+            'formatter': 'default',
+        },
+        'telegram_bot': {
+            'level': logging.INFO,
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': './logs/telegram_bot.log',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 10,
+            'formatter': 'default',
+        },
+        'main': {
+            'level': logging.INFO,
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': './logs/main.log',
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 10,
+            'formatter': 'default',
+        },
+    },
+    'loggers': {
+        '': {
+            'handlers': ['main'],
+            'level': logging.INFO,
+            'propagate': False,
+        },
+        'routers': {
+            'handlers': ['routers'],
+            'level': logging.INFO,
+            'propagate': False,
+        },
+        'routers.telegram_bot.bot': {
+            'handlers': ['telegram_bot'],
+            'level': logging.INFO,
+            'propagate': False,
+        },
+    },
+}

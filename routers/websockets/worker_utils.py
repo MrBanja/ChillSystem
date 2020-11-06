@@ -1,15 +1,22 @@
 """Utilities for working with RabbitMQ for websocket routing."""
 import json
+import logging
 
 import aio_pika
 
-from config import WebSocketWorkerCommands, CONNECTED_WEBSOCKETS, TUserId, CONNECTIONS_TO_CLOSE
+from config import WebSocketWorkerCommands, CONNECTED_WEBSOCKETS, TUserId, MQ_CONNECTIONS
 from utilites.redis_util import create_redis_pool, Redis
+
+
+logger = logging.getLogger(__name__)
 
 
 async def on_rabbit_massage(message: aio_pika.IncomingMessage):
     """Process incoming message from WebSocket exchange."""
     async with message.process():
+
+        logger.info(f'Receive message from worker -- {message.body}')
+
         message_body = json.loads(message.body.decode('utf-8'))
 
         command = WebSocketWorkerCommands(message_body['command'])
@@ -29,7 +36,7 @@ async def on_rabbit_massage(message: aio_pika.IncomingMessage):
 
 async def server_websocket_rabbit_consumer():
     """Consume messages from websocket worker."""
-    connection: aio_pika.Connection = CONNECTIONS_TO_CLOSE.get('server')
+    connection: aio_pika.Connection = MQ_CONNECTIONS.get('server')
     if connection is None:
         # TODO: log no opened connection.
         pass

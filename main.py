@@ -1,5 +1,9 @@
 """Main app start point"""
+import logging
+
 import config
+
+from logging.config import dictConfig
 
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
@@ -7,6 +11,9 @@ from fastapi.responses import FileResponse
 from routers.telegram_bot import router as telegram_api_router
 from routers.websockets import router as websocket_router
 
+
+dictConfig(config.LOGGING_CONFIG)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 app.debug = config.settings.debug
@@ -19,7 +26,7 @@ app.include_router(
 app.include_router(
     websocket_router.router,
     tags=['webSocket'],
-    prefix='/webSocket'
+    prefix='/webSocket',
 )
 
 

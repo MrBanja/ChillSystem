@@ -8,7 +8,7 @@ from logging.config import dictConfig
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 
-from routers.telegram_bot import router as telegram_api_router
+from bot import router as telegram_api_router
 from routers.websockets import router as websocket_router
 
 

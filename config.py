@@ -57,10 +57,10 @@ LOGGING_CONFIG = {
             'backupCount': 10,
             'formatter': 'default',
         },
-        'telegram_bot': {
+        'bot': {
             'level': logging.INFO,
             'class': 'logging.handlers.RotatingFileHandler',
-            'filename': './logs/telegram_bot.log',
+            'filename': './logs/bot.log',
             'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 10,
             'formatter': 'default',
@@ -85,8 +85,8 @@ LOGGING_CONFIG = {
             'level': logging.INFO,
             'propagate': False,
         },
-        'routers.telegram_bot.bot': {
-            'handlers': ['telegram_bot'],
+        'routers.bot.bot': {
+            'handlers': ['bot'],
             'level': logging.INFO,
             'propagate': False,
         },

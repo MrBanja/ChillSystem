@@ -7,7 +7,7 @@ import aio_pika
 import config
 
 from pprint import pprint
-
+from aiogram import executor, Dispatcher
 from bot import bot
 
 logger = logging.getLogger(__name__)
@@ -40,18 +40,7 @@ async def t_bot_delete_web_hook():
     logger.info('Remove webHook')
 
 
-@router.post(
-    '/{telegram_bot_token}/webHook',
-    dependencies=[Depends(verify_telegram_bot_token)],
-    include_in_schema=False,
-)
-async def web_hook(update_request: UpdateModel):
-    """Accept requests from telegram bot."""
-    print('NAME ---- ', __name__)
-    message_as_dict = update_request.dict(exclude_none=True)
-
-    logger.info(f'Accepted message from telegram bot.')
-    logger.debug(f'{message_as_dict}')
-
-    pprint(message_as_dict)
-    asyncio.create_task(bot.update_handler(update_request, default=t_bot_unknown_command))
+async def start_bot(dp: Dispatcher):
+    """Start bot"""
+    logger.info('Bot has started working')
+    executor.start_polling(dp, skip_updates=True, on_startup=t_bot_set_web_hook, on_shutdown=t_bot_delete_web_hook)

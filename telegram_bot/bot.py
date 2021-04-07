@@ -7,7 +7,7 @@ from aiogram import (Bot,
                      Dispatcher,
                      filters,
                      executor)
-from router import t_bot_set_web_hook, t_bot_delete_web_hook
+from webhook_settings import t_bot_set_web_hook, t_bot_delete_web_hook
 import sys
 sys.path.append('/app')
 import config

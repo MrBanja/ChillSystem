@@ -1,14 +1,10 @@
 """Router for telegram bot handling."""
 import logging
-import asyncio
-
 import aio_pika
-
 import config
-
-from pprint import pprint
 from aiogram import executor, Dispatcher
 from bot import bot
+
 
 logger = logging.getLogger(__name__)
 

@@ -29,3 +29,13 @@ services:
             - "8000:8000"
         volumes:
             - ./app:/app
+    chill_bot:
+        build: ./app
+        working_dir: /app
+        command: python telegram_bot/bot.py
+        depends_on:
+            - chill_redis
+        ports:
+            - "443:443"
+        volumes:
+            - ./app:/app

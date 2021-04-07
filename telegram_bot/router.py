@@ -39,4 +39,7 @@ async def t_bot_delete_web_hook():
 async def start_bot(dp: Dispatcher):
     """Start bot"""
     logger.info('Bot has started working')
-    executor.start_polling(dp, skip_updates=True, on_startup=t_bot_set_web_hook, on_shutdown=t_bot_delete_web_hook)
+    executor.start_polling(dp,
+                           skip_updates=True,
+                           on_startup=t_bot_set_web_hook,
+                           on_shutdown=t_bot_delete_web_hook)

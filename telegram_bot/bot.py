@@ -5,13 +5,13 @@ import aio_pika
 from aiogram import (Bot,
                      types,
                      Dispatcher,
-                     filters)
-from router import start_bot
+                     filters,
+                     executor)
+from router import t_bot_set_web_hook, t_bot_delete_web_hook
 import sys
 sys.path.append('/app')
 import config
 from utilites.redis_util import create_redis_pool, Redis
-
 
 logger = logging.getLogger(__name__)
 
@@ -120,4 +120,8 @@ async def t_bot_unknown_command(message: types.Message):
 
 
 if __name__ == '__main__':
-    start_bot(dp)
+    logger.info('Bot has started working')
+    executor.start_polling(dp,
+                           skip_updates=True,
+                           on_startup=t_bot_set_web_hook,
+                           on_shutdown=t_bot_delete_web_hook)

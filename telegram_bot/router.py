@@ -1,9 +1,11 @@
 """Router for telegram bot handling."""
 import logging
 import aio_pika
-import config
 from aiogram import executor, Dispatcher
 from bot import bot
+import sys
+sys.path.append('/app')
+import config
 
 
 logger = logging.getLogger(__name__)

@@ -20,7 +20,7 @@ async def t_bot_set_web_hook():
     Have sense only when testing with ngrok for example.
     """
     url = config.settings.ngrok_tunnel_address
-    await bot.set_web_hook(url)
+    await bot.set_webhook(url)
 
     logger.info('Set telegram webHook')
 
@@ -36,7 +36,7 @@ async def t_bot_delete_web_hook():
 
     Have sense only when testing with ngrok for example.
     """
-    await bot.delete_web_hook()
+    await bot.delete_webhook()
     logger.info('Remove webHook')
 
 

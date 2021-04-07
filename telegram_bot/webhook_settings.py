@@ -1,7 +1,7 @@
 """Router for telegram bot handling."""
 import logging
 import aio_pika
-from aiogram import Bot
+from aiogram import Bot, Dispatcher
 import sys
 sys.path.append('/app')
 import config
@@ -10,7 +10,7 @@ bot = Bot(token=config.settings.telegram_bot_token)
 logger = logging.getLogger(__name__)
 
 
-async def t_bot_set_web_hook(dp):
+async def t_bot_set_web_hook(dp: Dispatcher):
     """
     Set telegram webHook on server startup.
 
@@ -27,7 +27,7 @@ async def t_bot_set_web_hook(dp):
     logger.info('Establish connection to RabbitMQ for telegram bot')
 
 
-async def t_bot_delete_web_hook(dp):
+async def t_bot_delete_web_hook(dp: Dispatcher):
     """
     Delete telegram webHook on server shutdown.
 

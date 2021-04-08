@@ -32,7 +32,7 @@ services:
     chill_bot:
         build: ./app
         working_dir: /app
-        command: python telegram_bot/bot.py
+        command: python app/telegram_bot/bot.py
         depends_on:
             - chill_redis
         ports:

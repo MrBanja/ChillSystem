@@ -7,10 +7,8 @@ from aiogram import (Bot,
                      Dispatcher,
                      filters,
                      executor)
-from webhook_settings import t_bot_set_web_hook, t_bot_delete_web_hook
-import sys
-sys.path.append('/app')
 import config
+from webhook_settings import t_bot_set_web_hook, t_bot_delete_web_hook
 from utilites.redis_util import create_redis_pool, Redis
 
 logger = logging.getLogger(__name__)

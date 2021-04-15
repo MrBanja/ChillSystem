@@ -2,8 +2,6 @@
 import logging
 import aio_pika
 from aiogram import Bot, Dispatcher
-import sys
-sys.path.append('/app')
 import config
 
 bot = Bot(token=config.settings.telegram_bot_token)

@@ -32,10 +32,12 @@ services:
     chill_bot:
         build: ./app
         working_dir: /app
+        environment:
+            - PYTHONPATH=/app
         command: python app/telegram_bot/bot.py
         depends_on:
             - chill_redis
-        ports:
-            - "443:443"
+            - chill_rabbitmq
+            - chill_worker
         volumes:
             - ./app:/app

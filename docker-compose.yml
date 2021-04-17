@@ -34,7 +34,7 @@ services:
         working_dir: /app
         environment:
             - PYTHONPATH=/app
-        command: python app/telegram_bot/bot.py
+        entrypoint: /app/enterpoint_bot.sh
         depends_on:
             - chill_redis
             - chill_rabbitmq

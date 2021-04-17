@@ -18,7 +18,7 @@ bot = Bot(token=config.settings.telegram_bot_token)
 dp = Dispatcher(bot)
 
 
-@dp.message_handler(filters.RegexpCommandsFilter(regexp_commands=[r'^(https://)?(www.)?(youtu.be|youtube.com)']))
+@dp.message_handler(filters.Regexp(regexp=r'^(https://)?(www.)?(youtu.be|youtube.com)'))
 async def t_bot_add_youtube_url_to_queue(message: types.Message):
     """
     Handle youtube video urls sent to bot.

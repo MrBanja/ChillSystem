@@ -107,7 +107,7 @@ async def t_bot_clear_youtube_urls_from_queue(message: types.Message):
 
         await redis.delete(message.chat.id)
 
-        await bot.send_message('Queue cleared!', message.chat.id)
+        await message.answer('Queue cleared!')
 
         logger.info(f'Clear users[{message.chat.id}] video queue')
 

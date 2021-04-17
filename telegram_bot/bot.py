@@ -10,6 +10,7 @@ from aiogram import (Bot,
 import config
 from webhook_settings import t_bot_set_web_hook, t_bot_delete_web_hook
 from utilites.redis_util import create_redis_pool, Redis
+from dependencies import check_if_command_available
 
 logger = logging.getLogger(__name__)
 
@@ -111,10 +112,12 @@ async def t_bot_clear_youtube_urls_from_queue(message: types.Message):
         logger.info(f'Clear users[{message.chat.id}] video queue')
 
 
+@dp.message_handler()
 async def t_bot_unknown_command(message: types.Message):
     """Handle unknown message to the telegram bot."""
     # FIXME: Message could not be in update.
-    await message.answer('Unknown command')
+    if check_if_command_available(message.text) and message.is_command():
+        await message.answer('Unknown command')
 
 
 if __name__ == '__main__':

@@ -11,7 +11,7 @@ Redis = aioredis.Redis
 @asynccontextmanager
 async def create_redis_pool() -> AsyncContextManager[Redis]:
     """Create redis poll as as async content manager."""
-    redis = await aioredis.create_redis_pool(f'redis://youtube_sitter_chill_redis_1')
+    redis = await aioredis.create_redis_pool(f'redis://chill_redis')
     try:
         yield redis
     finally:

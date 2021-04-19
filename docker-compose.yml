@@ -29,3 +29,15 @@ services:
             - "8000:8000"
         volumes:
             - ./app:/app
+    chill_bot:
+        build: ./app
+        working_dir: /app
+        environment:
+            - PYTHONPATH=/app
+        entrypoint: /app/enterpoint_bot.sh
+        depends_on:
+            - chill_redis
+            - chill_rabbitmq
+            - chill_worker
+        volumes:
+            - ./app:/app

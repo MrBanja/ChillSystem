@@ -27,9 +27,9 @@ class WebSocketWorkerCommands(enum.Enum):
 class Settings(BaseSettings):
     """Settings fro project loaded from .env file."""
 
-    debug: bool
     telegram_bot_token: str
-    ngrok_tunnel_address: str
+    debug: bool = False
+    ngrok_tunnel_address: str = ''
 
     class Config:
         """Configs fro pydantic BaseSettings."""

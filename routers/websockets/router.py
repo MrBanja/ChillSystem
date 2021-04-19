@@ -45,7 +45,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
 @router.on_event('startup')
 async def startup_rabbit_listener():
     """Open RabbitMQ connection for server listener and launch demon consumer."""
-    connection: aio_pika.Connection = await aio_pika.connect(f"amqp://guest:guest@youtube_sitter_chill_rabbitmq_1/")
+    connection: aio_pika.Connection = await aio_pika.connect(f"amqp://guest:guest@chill_rabbit/")
     MQ_CONNECTIONS['server'] = connection
     logger.info('Establish RabbitMQ connection.')
 

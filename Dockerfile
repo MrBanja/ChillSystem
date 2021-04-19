@@ -1,4 +1,6 @@
-FROM python:3.8-slim-buster
+FROM python:3.9
+
+RUN apt-get update && apt-get install -y libpq-dev gcc
 
 ENV PYTHONUNBUFFERED 1
 
@@ -9,7 +11,5 @@ RUN mkdir /app/logs
 WORKDIR /app
 COPY . /app
 
-EXPOSE 8000
-
-RUN pip install -r /etc/requirements.txt
+RUN pip3 install -r /etc/requirements.txt
 

@@ -57,29 +57,15 @@ You need to have docker and docker-compose installed.
 
 1. Create project dir named youtube_sitter;
 2. Create `app` folder in it;
-3. Clone this repo in the `app` folder;
+3. Clone this repo;
 4. Create `.env` file. About .env
-5. Run `create_project_tree.sh`;
-6. Go to `redis` directory;
-7. Open `redis.conf`;
-8. Make you own redis config file. (By default redis expose `6379` port. If you
-would like to change it, don't forget about `docker-compose.yml`. Also `daemonize` should be set
-to `no`);
-9. Go back to `youtube_sitter` dir;
-10. Run `docker-compose build`;
-11. Start your app `docker-compose up`.
+5. Run `docker-compose build`;
+6. Start your app `docker-compose up`.
 
 ```shell script
-$ mkdir youtube_sitter
-$ cd youtube_sitter
-$ mkdir app
-$ cd app
-$ git clone https://github.com/AngliD/ChillSystem .
+$ git clone https://github.com/AngliD/ChillSystem
+$ cd ChillSystem
 $ vim .env
-$ ./create_project_tree.sh
-$ cd ../redis
-$ vim redis.conf
-$ cd ..
 $ docker-compose build
 $ docker-compose up
 ```

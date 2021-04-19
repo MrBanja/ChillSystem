@@ -1,43 +1,81 @@
 version: "3"
 services:
-    chill_redis:
-        build: ./redis
-        ports:
-            - 6379:6379
-    chill_rabbitmq:
-        image: rabbitmq:3-management
-        ports:
-            - "5672:5672"
-            - "15672:15672"
-    chill_worker:
-        build: ./app
-        working_dir: /app
-        entrypoint: /app/enterpoint_workers.sh
-        depends_on:
-            - chill_rabbitmq
-        volumes:
-            - ./app:/app
-    chill_web:
-        build: ./app
-        working_dir: /app
-        entrypoint: /app/enterpoint_web.sh
-        depends_on:
-            - chill_redis
-            - chill_rabbitmq
-            - chill_worker
-        ports:
-            - "8000:8000"
-        volumes:
-            - ./app:/app
-    chill_bot:
-        build: ./app
-        working_dir: /app
-        environment:
-            - PYTHONPATH=/app
-        entrypoint: /app/enterpoint_bot.sh
-        depends_on:
-            - chill_redis
-            - chill_rabbitmq
-            - chill_worker
-        volumes:
-            - ./app:/app
+  chill_redis:
+    image: redis:latest
+    container_name: chill_redis_cont
+    networks:
+      chill_network:
+        aliases:
+          - chill_redis
+
+  chill_rabbitmq:
+    image: rabbitmq:3-management
+    container_name: chill_rabbitmq_cont
+    networks:
+      chill_network:
+        aliases:
+          - chill_rabbit
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  chill_worker:
+    build: .
+    working_dir: /app
+    container_name: chill_worker_cont
+    depends_on:
+      - chill_rabbitmq
+    volumes:
+      - ./:/app
+    networks:
+      - chill_network
+    entrypoint: /app/wait-for-it.sh -h chill_rabbit -p 5672 -t 0 --
+    command:
+      - "python"
+      - "workers/web_socket_worker.py"
+
+
+  chill_web:
+    build: .
+    working_dir: /app
+    container_name: chill_web_cont
+    depends_on:
+      - chill_redis
+      - chill_rabbitmq
+      - chill_worker
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./:/app
+    networks:
+      - chill_network
+    entrypoint: /app/wait-for-it.sh -h chill_rabbit -p 5672 -t 0 --
+    command:
+      - "uvicorn"
+      - "main:app"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8000"
+
+  chill_bot:
+    build: .
+    working_dir: /app
+    container_name: chill_bot_cont
+    environment:
+      - PYTHONPATH=/app
+    depends_on:
+      - chill_redis
+      - chill_rabbitmq
+      - chill_worker
+    volumes:
+      - ./:/app
+    networks:
+      - chill_network
+    entrypoint: /app/wait-for-it.sh -h chill_rabbit -p 5672 -t 0 --
+    command:
+      - "python"
+      - "telegram_bot/bot.py"
+
+networks:
+  chill_network:

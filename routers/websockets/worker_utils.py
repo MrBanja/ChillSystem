@@ -1,14 +1,18 @@
 """Utilities for working with RabbitMQ for websocket routing."""
 import json
-import logging
 
+import config
 import aio_pika
 
-from config import WebSocketWorkerCommands, CONNECTED_WEBSOCKETS, TUserId, MQ_CONNECTIONS
+from config import (WebSocketWorkerCommands,
+                    CONNECTED_WEBSOCKETS,
+                    TUserId,
+                    MQ_CONNECTIONS,
+                    create_logger)
 from utilites.redis_util import create_redis_pool, Redis
 
-
-logger = logging.getLogger(__name__)
+logger = create_logger(config.settings.debug)
+logger.remove()
 
 
 async def on_rabbit_massage(message: aio_pika.IncomingMessage):

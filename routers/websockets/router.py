@@ -1,19 +1,20 @@
 """Router for websockets."""
-import logging
 import asyncio
-
+import config
 import aio_pika
 
 from fastapi import APIRouter, WebSocket
 from starlette.websockets import WebSocketDisconnect
 
-from config import CONNECTED_WEBSOCKETS, TUserId, MQ_CONNECTIONS
+from config import (CONNECTED_WEBSOCKETS,
+                    TUserId,
+                    MQ_CONNECTIONS,
+                    create_logger)
 from routers.websockets.worker_utils import server_websocket_rabbit_consumer
 
 
-logger = logging.getLogger(__name__)
-
 router = APIRouter()
+logger = create_logger(config.settings.debug)
 
 
 @router.websocket('/ws')

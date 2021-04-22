@@ -3,7 +3,7 @@ from __future__ import annotations
 import enum
 import pathlib
 import aio_pika
-
+import logging
 from typing import Dict, NewType
 from fastapi import WebSocket
 from pydantic import BaseSettings
@@ -43,7 +43,6 @@ settings = Settings()
 
 def create_logger(debug_status: bool) -> loguru.logger:
     """Create project loggers depending on debug status"""
-
     if debug_status:
         logger.add(sink=sys.stderr,
                    format='{time} | {level} | {exception} {file.path} {function} '
@@ -65,3 +64,11 @@ def create_logger(debug_status: bool) -> loguru.logger:
                filter=lambda record: record['extra'].get('name') == 'production_logger')
     production_logger = logger.bind(name='production_logger')
     return production_logger
+
+
+def change_basic_logging_level(debug_status: bool, library_name: str) -> None:
+    """Change logging level depending on debug status"""
+    library_logger = logging.getLogger(library_name)
+    if debug_status:
+        library_logger.setLevel('DEBUG')
+    library_logger.setLevel('WARNING')

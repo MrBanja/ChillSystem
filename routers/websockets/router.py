@@ -17,13 +17,14 @@ router = APIRouter()
 logger = create_logger(config.settings.debug)
 
 
+@logger.catch
 @router.websocket('/ws')
 async def websocket_endpoint(websocket: WebSocket, user_id: int):
     """Establish websocket connection."""
     logger.info(f'Establish webSocket connection with user[{user_id}]')
 
     if user_id in CONNECTED_WEBSOCKETS:
-        logger.warning(f'Current user[{user_id}] is already connected')
+        logger.debug(f'Current user[{user_id}] is already connected')
 
         return await websocket.close()
 
@@ -37,7 +38,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
             # TODO: Here will be queue listener for font side websocket message
 
         except WebSocketDisconnect:
-            logger.warning(f'Users[{user_id}] connection was closed')
+            logger.debug(f'Users[{user_id}] connection was closed')
 
             del CONNECTED_WEBSOCKETS[TUserId(user_id)]
             break

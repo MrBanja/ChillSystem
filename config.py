@@ -46,8 +46,7 @@ def create_logger(debug_status: bool) -> loguru.logger:
     if debug_status:
         logger.add(sink=sys.stderr,
                    format='{time} | {level} | {exception} {file.path} {function} '
-                          'line:{line} { '
-                          'message}',
+                          'line:{line} {message}',
                    enqueue=True,
                    diagnose=True,
                    catch=True,

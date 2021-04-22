@@ -33,4 +33,4 @@ async def t_bot_delete_web_hook(dp: Dispatcher):
     Have sense only when testing with ngrok for example.
     """
     await bot.delete_webhook()
-    logger.info('Remove webHook')
+    logger.info('Bot has removed webHook')

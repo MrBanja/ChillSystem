@@ -25,7 +25,7 @@ async def t_bot_add_youtube_url_to_queue(message: types.Message):
 
     Add video url to user's queue.
     """
-    logger.info(f'User[{message.chat.id}] send youtube link -- {message.text}')
+    logger.debug(f'User[{message.chat.id}] send youtube link -- {message.text}')
 
     async with create_redis_pool() as redis:
         redis: Redis
@@ -36,7 +36,7 @@ async def t_bot_add_youtube_url_to_queue(message: types.Message):
 
         res = await redis.lpush(message.chat.id, youtube_url)
 
-        logger.info('Add video to queue.')
+        logger.debug('Add video to queue.')
 
         await message.answer(f'Nice video, bro! {res} videos in queue')
 
@@ -48,7 +48,7 @@ async def t_bot_get_youtube_urls_from_queue(message: types.Message):
 
     Show all youtube videos queue for user.
     """
-    logger.info(f'User[{message.chat.id}] send `list` command')
+    logger.debug(f'User[{message.chat.id}] send `list` command')
 
     async with create_redis_pool() as redis:
         redis: Redis
@@ -66,7 +66,7 @@ async def t_bot_skip_video(message: types.Message):
 
     Skip video to next one.
     """
-    logger.info(f'User[{message.chat.id}] send `skip` command')
+    logger.debug(f'User[{message.chat.id}] send `skip` command')
 
     connection = config.MQ_CONNECTIONS.get('TBot')
 
@@ -90,7 +90,7 @@ async def t_bot_skip_video(message: types.Message):
 
     await websocket_exchange.publish(data, routing_key='bot-worker')
 
-    logger.info('Send skip command to the worker.')
+    logger.debug(f'User:{message.chat.id}Send skip command to the worker.')
 
 
 @dp.message_handler(commands=['clear'])
@@ -100,7 +100,7 @@ async def t_bot_clear_youtube_urls_from_queue(message: types.Message):
 
     Clear all youtube videos queue for user.
     """
-    logger.info(f'User[{message.chat.id}] send `clear` command')
+    logger.debug(f'User[{message.chat.id}] send `clear` command')
 
     async with create_redis_pool() as redis:
         redis: Redis
@@ -109,7 +109,7 @@ async def t_bot_clear_youtube_urls_from_queue(message: types.Message):
 
         await message.answer('Queue cleared!')
 
-        logger.info(f'Clear users[{message.chat.id}] video queue')
+        logger.debug(f'Clear users[{message.chat.id}] video queue')
 
 
 @dp.message_handler()
@@ -118,10 +118,11 @@ async def t_bot_unknown_command(message: types.Message):
     # FIXME: Message could not be in update.
     if check_if_command_available(message.text) and message.is_command():
         await message.answer('Unknown command')
-
+        logger.debug(f'User {message.chat.id} sent unknown command')
 
 if __name__ == '__main__':
     executor.start_polling(dp,
                            skip_updates=True,
                            on_startup=t_bot_set_web_hook,
                            on_shutdown=t_bot_delete_web_hook)
+    logger.info('Bot has started working')

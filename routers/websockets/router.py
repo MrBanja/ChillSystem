@@ -15,6 +15,7 @@ from routers.websockets.worker_utils import server_websocket_rabbit_consumer
 
 router = APIRouter()
 logger = create_logger(config.settings.debug)
+logger.remove()
 
 
 @logger.catch

@@ -1,7 +1,5 @@
 """Router for telegram bot handling."""
 import json
-import sys
-
 import aio_pika
 from aiogram import (Bot,
                      types,
@@ -10,7 +8,7 @@ from aiogram import (Bot,
                      executor)
 import config
 from loguru import logger
-from config import create_logger
+from config import create_logger, change_basic_logging_level
 from webhook_settings import t_bot_set_web_hook, t_bot_delete_web_hook
 from utilites.redis_util import create_redis_pool, Redis
 from dependencies import check_if_command_available
@@ -123,6 +121,7 @@ async def t_bot_unknown_command(message: types.Message):
 
 
 if __name__ == '__main__':
+    change_basic_logging_level(config.settings.debug, 'aiogram')
     create_logger(config.settings.debug)
     executor.start_polling(dp,
                            skip_updates=True,

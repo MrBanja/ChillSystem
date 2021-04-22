@@ -23,7 +23,6 @@ async def t_bot_set_web_hook(dp: Dispatcher):
     connection: aio_pika.Connection = await aio_pika.connect(f"amqp://guest:guest@chill_rabbit/")
     config.MQ_CONNECTIONS['TBot'] = connection
     logger.info('Establish connection to RabbitMQ for telegram bot')
-    logger.debug('TEST TEST TEST')
     logger.info('Bot has started working')
 
 

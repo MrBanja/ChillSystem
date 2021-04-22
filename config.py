@@ -1,14 +1,15 @@
 """Server-wide configurations."""
+from __future__ import annotations
 import enum
 import pathlib
-import logging
-
 import aio_pika
 
 from typing import Dict, NewType
-
 from fastapi import WebSocket
 from pydantic import BaseSettings
+import loguru
+import sys
+from loguru import logger
 
 TUserId = NewType('TUserId', int)
 BASE_DIR = pathlib.Path('.').parent.resolve()
@@ -40,55 +41,27 @@ class Settings(BaseSettings):
 settings = Settings()
 
 
-LOGGING_CONFIG = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'default': {
-            'format': '%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-        },
-    },
-    'handlers': {
-        'routers': {
-            'level': logging.INFO,
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': './logs/routers.log',
-            'maxBytes': 1024 * 1024 * 5,  # 5 MB
-            'backupCount': 10,
-            'formatter': 'default',
-        },
-        'bot': {
-            'level': logging.INFO,
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': './logs/bot.log',
-            'maxBytes': 1024 * 1024 * 5,  # 5 MB
-            'backupCount': 10,
-            'formatter': 'default',
-        },
-        'main': {
-            'level': logging.INFO,
-            'class': 'logging.handlers.RotatingFileHandler',
-            'filename': './logs/main.log',
-            'maxBytes': 1024 * 1024 * 5,  # 5 MB
-            'backupCount': 10,
-            'formatter': 'default',
-        },
-    },
-    'loggers': {
-        '': {
-            'handlers': ['main'],
-            'level': logging.INFO,
-            'propagate': False,
-        },
-        'routers': {
-            'handlers': ['routers'],
-            'level': logging.INFO,
-            'propagate': False,
-        },
-        'routers.bot.bot': {
-            'handlers': ['bot'],
-            'level': logging.INFO,
-            'propagate': False,
-        },
-    },
-}
+def create_logger(debug_status: bool) -> loguru.logger:
+    """Create project loggers depending on debug status"""
+
+    if debug_status:
+        logger.add(sink=sys.stderr,
+                   format='{time} | {level} | {exception} {file.path} {function} '
+                          'line:{line} { '
+                          'message}',
+                   enqueue=True,
+                   diagnose=True,
+                   catch=True,
+                   backtrace=True,
+                   filter=lambda record: record['extra'].get('name') == 'debug_logger',
+                   level='DEBUG')
+        debug_logger = logger.bind(name='debug_logger')
+        return debug_logger
+
+    logger.add(sink=sys.stderr,
+               format='{time} | {level} | {function} {message}',
+               enqueue=True,
+               level='INFO',
+               filter=lambda record: record['extra'].get('name') == 'production_logger')
+    production_logger = logger.bind(name='production_logger')
+    return production_logger

@@ -1,17 +1,17 @@
 """Router for websockets."""
 import asyncio
-import config
+
 import aio_pika
-
+import config
+from config import (
+    CONNECTED_WEBSOCKETS,
+    TUserId,
+    MQ_CONNECTIONS,
+    create_logger
+)
 from fastapi import APIRouter, WebSocket
-from starlette.websockets import WebSocketDisconnect
-
-from config import (CONNECTED_WEBSOCKETS,
-                    TUserId,
-                    MQ_CONNECTIONS,
-                    create_logger)
 from routers.websockets.worker_utils import server_websocket_rabbit_consumer
-
+from starlette.websockets import WebSocketDisconnect
 
 router = APIRouter()
 logger = create_logger(config.settings.debug)
@@ -25,7 +25,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
     logger.info(f'Establish webSocket connection with user[{user_id}]')
 
     if user_id in CONNECTED_WEBSOCKETS:
-        logger.debug(f'Current user[{user_id}] is already connected')
+        logger.warning(f'Current user[{user_id}] is already connected')
 
         return await websocket.close()
 

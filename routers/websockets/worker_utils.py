@@ -1,14 +1,15 @@
 """Utilities for working with RabbitMQ for websocket routing."""
 import json
 
-import config
 import aio_pika
-
-from config import (WebSocketWorkerCommands,
-                    CONNECTED_WEBSOCKETS,
-                    TUserId,
-                    MQ_CONNECTIONS,
-                    create_logger)
+import config
+from config import (
+    WebSocketWorkerCommands,
+    CONNECTED_WEBSOCKETS,
+    TUserId,
+    MQ_CONNECTIONS,
+    create_logger
+)
 from utilites.redis_util import create_redis_pool, Redis
 
 logger = create_logger(config.settings.debug)
@@ -27,7 +28,7 @@ async def on_rabbit_massage(message: aio_pika.IncomingMessage):
         user_id = message_body['from']
 
         if command == WebSocketWorkerCommands.CLOSE_WS_CONNECTION:
-            logger.debug(f'Closing connection with {user_id}')
+            logger.info(f'Closing connection with {user_id}')
             await CONNECTED_WEBSOCKETS[TUserId(user_id)].close()
 
         elif command == WebSocketWorkerCommands.SKIP:

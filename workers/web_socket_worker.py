@@ -1,10 +1,11 @@
 """Worker for dispatching server/bot commands."""
 import asyncio
 import config
+from loguru import logger
 from config import create_logger
 import aio_pika
 
-
+logger.remove()
 logger = create_logger(config.settings.debug)
 
 

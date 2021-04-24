@@ -1,9 +1,10 @@
 """Worker for dispatching server/bot commands."""
 import asyncio
-import config
-from loguru import logger
-from config import create_logger
+
 import aio_pika
+import config
+from config import create_logger
+from loguru import logger
 
 logger.remove()
 logger = create_logger(config.settings.debug)
@@ -12,8 +13,8 @@ logger = create_logger(config.settings.debug)
 async def on_message_to_rabbit_exchange(message: aio_pika.IncomingMessage):
     """Route messages to server for additional handling."""
     async with message.process():
-        logger.info(f'Got message from {message.routing_key}')
-        logger.info(f'Message body {message.body}')
+        logger.debug(f'Got message from {message.routing_key}')
+        logger.debug(f'Message body {message.body}')
 
         connection: aio_pika.Connection = await aio_pika.connect(
             "amqp://guest:guest@chill_rabbit//")

@@ -1,14 +1,15 @@
 """Server-wide configurations."""
 import enum
-import pathlib
-import aio_pika
 import logging
-from typing import Dict, NewType
-from fastapi import WebSocket
-from pydantic import BaseSettings
-import loguru
+import pathlib
 import sys
+from typing import Dict, NewType
+
+import aio_pika
+import loguru
+from fastapi import WebSocket
 from loguru import logger
+from pydantic import BaseSettings
 
 TUserId = NewType('TUserId', int)
 BASE_DIR = pathlib.Path('.').parent.resolve()

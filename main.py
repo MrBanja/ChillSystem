@@ -1,12 +1,11 @@
 """Main app start point"""
 
-import config
-from config import create_logger
 from fastapi import FastAPI
 from fastapi.responses import FileResponse
 
+import config
+from config import create_logger
 from routers.websockets import router as websocket_router
-
 
 app = FastAPI()
 app.debug = config.settings.debug

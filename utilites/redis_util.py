@@ -1,9 +1,8 @@
 """Utils for redis connection."""
-import aioredis
-
 from contextlib import asynccontextmanager
 from typing import AsyncContextManager
 
+import aioredis
 
 Redis = aioredis.Redis
 

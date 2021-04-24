@@ -1,7 +1,7 @@
 """Router for telegram bot handling."""
 import aio_pika
-from aiogram import Bot, Dispatcher
 import config
+from aiogram import Bot, Dispatcher
 from config import create_logger
 
 logger = create_logger(config.settings.debug)

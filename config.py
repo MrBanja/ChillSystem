@@ -1,5 +1,4 @@
 """Server-wide configurations."""
-from __future__ import annotations
 import enum
 import pathlib
 import aio_pika

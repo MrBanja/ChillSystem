@@ -28,7 +28,7 @@ async def t_bot_add_youtube_url_to_queue(message: types.Message):
 
     Add video url to user's queue.
     """
-    logger.debug(f'User[{message.chat.id}] send youtube link -- {message.text}')
+    logger.debug(f'User[{message.from_user.id}] send youtube link -- {message.text}')
 
     async with create_redis_pool() as redis:
         redis: Redis
@@ -37,7 +37,7 @@ async def t_bot_add_youtube_url_to_queue(message: types.Message):
         video_id = message.text[17:]
         youtube_url = f'https://www.youtube.com/embed/{video_id}?autoplay=1'
 
-        res = await redis.lpush(message.chat.id, youtube_url)
+        res = await redis.lpush(message.from_user.id, youtube_url)
 
         logger.debug('Add video to queue.')
 
@@ -51,13 +51,13 @@ async def t_bot_get_youtube_urls_from_queue(message: types.Message):
 
     Show all youtube videos queue for user.
     """
-    logger.debug(f'User[{message.chat.id}] send `list` command')
+    logger.debug(f'User[{message.from_user.id}] send `list` command')
 
     async with create_redis_pool() as redis:
         redis: Redis
 
-        queue_len = await redis.llen(message.chat.id)
-        resp = await redis.lrange(message.chat.id, 0, queue_len, encoding='utf-8')
+        queue_len = await redis.llen(message.from_user.id)
+        resp = await redis.lrange(message.from_user.id, 0, queue_len, encoding='utf-8')
 
         await message.answer(f'{resp}')
 
@@ -69,12 +69,12 @@ async def t_bot_skip_video(message: types.Message):
 
     Skip video to next one.
     """
-    logger.debug(f'User[{message.chat.id}] send `skip` command')
+    logger.debug(f'User[{message.from_user.id}] send `skip` command')
 
     connection = config.MQ_CONNECTIONS.get('TBot')
 
     if connection is None:
-        logger.warning(f'Connection for user[{message.chat.id}] is not open.')
+        logger.warning(f'Connection for user[{message.from_user.id}] is not open.')
         return await message.answer('You are not logged in at the site.')
 
     channel: aio_pika.Channel = await connection.channel()
@@ -93,7 +93,7 @@ async def t_bot_skip_video(message: types.Message):
 
     await websocket_exchange.publish(data, routing_key='bot-worker')
 
-    logger.debug(f'User:{message.chat.id}Send skip command to the worker.')
+    logger.debug(f'User:{message.from_user.id}Send skip command to the worker.')
 
 
 @dp.message_handler(commands=['clear'])
@@ -103,7 +103,7 @@ async def t_bot_clear_youtube_urls_from_queue(message: types.Message):
 
     Clear all youtube videos queue for user.
     """
-    logger.debug(f'User[{message.chat.id}] send `clear` command')
+    logger.debug(f'User[{message.from_user.id}] send `clear` command')
 
     async with create_redis_pool() as redis:
         redis: Redis
@@ -112,7 +112,7 @@ async def t_bot_clear_youtube_urls_from_queue(message: types.Message):
 
         await message.answer('Queue cleared!')
 
-        logger.debug(f'Clear users[{message.chat.id}] video queue')
+        logger.debug(f'Clear users[{message.from_user.id}] video queue')
 
 
 @dp.message_handler()
@@ -121,7 +121,7 @@ async def t_bot_unknown_command(message: types.Message):
     # FIXME: Message could not be in update.
     if check_if_command_available(message.text) and message.is_command():
         await message.answer('Unknown command')
-        logger.debug(f'User {message.chat.id} sent unknown command')
+        logger.debug(f'User {message.from_user.id} sent unknown command')
 
 
 if __name__ == '__main__':

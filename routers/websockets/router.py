@@ -1,21 +1,24 @@
 """Router for websockets."""
-import logging
 import asyncio
 
 import aio_pika
-
+import config
+from config import (
+    CONNECTED_WEBSOCKETS,
+    TUserId,
+    MQ_CONNECTIONS,
+    create_logger
+)
 from fastapi import APIRouter, WebSocket
+from routers.websockets.worker_utils import server_websocket_rabbit_consumer
 from starlette.websockets import WebSocketDisconnect
 
-from config import CONNECTED_WEBSOCKETS, TUserId, MQ_CONNECTIONS
-from routers.websockets.worker_utils import server_websocket_rabbit_consumer
-
-
-logger = logging.getLogger(__name__)
-
 router = APIRouter()
+logger = create_logger(config.settings.debug)
+logger.remove()
 
 
+@logger.catch
 @router.websocket('/ws')
 async def websocket_endpoint(websocket: WebSocket, user_id: int):
     """Establish websocket connection."""
@@ -36,7 +39,7 @@ async def websocket_endpoint(websocket: WebSocket, user_id: int):
             # TODO: Here will be queue listener for font side websocket message
 
         except WebSocketDisconnect:
-            logger.warning(f'Users[{user_id}] connection was closed')
+            logger.debug(f'Users[{user_id}] connection was closed')
 
             del CONNECTED_WEBSOCKETS[TUserId(user_id)]
             break

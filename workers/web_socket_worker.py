@@ -2,13 +2,19 @@
 import asyncio
 
 import aio_pika
+import config
+from config import create_logger
+from loguru import logger
+
+logger.remove()
+logger = create_logger(config.settings.debug)
 
 
 async def on_message_to_rabbit_exchange(message: aio_pika.IncomingMessage):
     """Route messages to server for additional handling."""
     async with message.process():
-        print(f'Got message from {message.routing_key}')
-        print(f'Message body {message.body}')
+        logger.debug(f'Got message from {message.routing_key}')
+        logger.debug(f'Message body {message.body}')
 
         connection: aio_pika.Connection = await aio_pika.connect(
             "amqp://guest:guest@chill_rabbit//")
@@ -31,7 +37,7 @@ async def main():
     connection: aio_pika.Connection = await aio_pika.connect(
         "amqp://guest:guest@chill_rabbit//")
 
-    print('Connected')
+    logger.info('Establish connection to rabbitMQ')
 
     channel: aio_pika.Channel = await connection.channel()
 

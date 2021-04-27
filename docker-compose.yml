@@ -23,6 +23,8 @@ services:
     build: .
     working_dir: /app
     container_name: chill_worker_cont
+    environment:
+      - PYTHONPATH=/app
     depends_on:
       - chill_rabbitmq
     volumes:

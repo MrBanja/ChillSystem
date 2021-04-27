@@ -1,11 +1,12 @@
 """Router for telegram bot handling."""
-import logging
 import aio_pika
-from aiogram import Bot, Dispatcher
 import config
+from aiogram import Bot, Dispatcher
+from config import create_logger
 
+logger = create_logger(config.settings.debug)
+logger.remove()
 bot = Bot(token=config.settings.telegram_bot_token)
-logger = logging.getLogger(__name__)
 
 
 async def t_bot_set_web_hook(dp: Dispatcher):
@@ -21,8 +22,8 @@ async def t_bot_set_web_hook(dp: Dispatcher):
 
     connection: aio_pika.Connection = await aio_pika.connect(f"amqp://guest:guest@chill_rabbit/")
     config.MQ_CONNECTIONS['TBot'] = connection
-
     logger.info('Establish connection to RabbitMQ for telegram bot')
+    logger.info('Bot has started working')
 
 
 async def t_bot_delete_web_hook(dp: Dispatcher):
@@ -32,4 +33,4 @@ async def t_bot_delete_web_hook(dp: Dispatcher):
     Have sense only when testing with ngrok for example.
     """
     await bot.delete_webhook()
-    logger.info('Remove webHook')
+    logger.info('Bot has removed webHook')

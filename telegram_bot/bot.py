@@ -1,19 +1,22 @@
 """Router for telegram bot handling."""
-import logging
 import json
+
 import aio_pika
-from aiogram import (Bot,
-                     types,
-                     Dispatcher,
-                     filters,
-                     executor)
 import config
-from webhook_settings import t_bot_set_web_hook, t_bot_delete_web_hook
+from aiogram import (
+    Bot,
+    types,
+    Dispatcher,
+    filters,
+    executor
+)
+from config import create_logger, change_basic_logging_level
 from utilites.redis_util import create_redis_pool, Redis
+
 from dependencies import check_if_command_available
+from webhook_settings import t_bot_set_web_hook, t_bot_delete_web_hook
 
-logger = logging.getLogger(__name__)
-
+logger = create_logger(config.settings.debug)
 bot = Bot(token=config.settings.telegram_bot_token)
 dp = Dispatcher(bot)
 
@@ -25,7 +28,7 @@ async def t_bot_add_youtube_url_to_queue(message: types.Message):
 
     Add video url to user's queue.
     """
-    logger.info(f'User[{message.chat.id}] send youtube link -- {message.text}')
+    logger.debug(f'User[{message.from_user.id}] send youtube link -- {message.text}')
 
     async with create_redis_pool() as redis:
         redis: Redis
@@ -34,9 +37,9 @@ async def t_bot_add_youtube_url_to_queue(message: types.Message):
         video_id = message.text[17:]
         youtube_url = f'https://www.youtube.com/embed/{video_id}?autoplay=1'
 
-        res = await redis.lpush(message.chat.id, youtube_url)
+        res = await redis.lpush(message.from_user.id, youtube_url)
 
-        logger.info('Add video to queue.')
+        logger.debug('Add video to queue.')
 
         await message.answer(f'Nice video, bro! {res} videos in queue')
 
@@ -48,13 +51,13 @@ async def t_bot_get_youtube_urls_from_queue(message: types.Message):
 
     Show all youtube videos queue for user.
     """
-    logger.info(f'User[{message.chat.id}] send `list` command')
+    logger.debug(f'User[{message.from_user.id}] send `list` command')
 
     async with create_redis_pool() as redis:
         redis: Redis
 
-        queue_len = await redis.llen(message.chat.id)
-        resp = await redis.lrange(message.chat.id, 0, queue_len, encoding='utf-8')
+        queue_len = await redis.llen(message.from_user.id)
+        resp = await redis.lrange(message.from_user.id, 0, queue_len, encoding='utf-8')
 
         await message.answer(f'{resp}')
 
@@ -66,12 +69,12 @@ async def t_bot_skip_video(message: types.Message):
 
     Skip video to next one.
     """
-    logger.info(f'User[{message.chat.id}] send `skip` command')
+    logger.debug(f'User[{message.from_user.id}] send `skip` command')
 
     connection = config.MQ_CONNECTIONS.get('TBot')
 
     if connection is None:
-        logger.warning(f'Connection for user[{message.chat.id}] is not open.')
+        logger.warning(f'Connection for user[{message.from_user.id}] is not open.')
         return await message.answer('You are not logged in at the site.')
 
     channel: aio_pika.Channel = await connection.channel()
@@ -90,7 +93,7 @@ async def t_bot_skip_video(message: types.Message):
 
     await websocket_exchange.publish(data, routing_key='bot-worker')
 
-    logger.info('Send skip command to the worker.')
+    logger.debug(f'User:{message.from_user.id}Send skip command to the worker.')
 
 
 @dp.message_handler(commands=['clear'])
@@ -100,7 +103,7 @@ async def t_bot_clear_youtube_urls_from_queue(message: types.Message):
 
     Clear all youtube videos queue for user.
     """
-    logger.info(f'User[{message.chat.id}] send `clear` command')
+    logger.debug(f'User[{message.from_user.id}] send `clear` command')
 
     async with create_redis_pool() as redis:
         redis: Redis
@@ -109,7 +112,7 @@ async def t_bot_clear_youtube_urls_from_queue(message: types.Message):
 
         await message.answer('Queue cleared!')
 
-        logger.info(f'Clear users[{message.chat.id}] video queue')
+        logger.debug(f'Clear users[{message.from_user.id}] video queue')
 
 
 @dp.message_handler()
@@ -118,11 +121,13 @@ async def t_bot_unknown_command(message: types.Message):
     # FIXME: Message could not be in update.
     if check_if_command_available(message.text) and message.is_command():
         await message.answer('Unknown command')
+        logger.debug(f'User {message.from_user.id} sent unknown command')
 
 
 if __name__ == '__main__':
-    logger.info('Bot has started working')
+    change_basic_logging_level(config.settings.debug, 'aiogram')
     executor.start_polling(dp,
                            skip_updates=True,
                            on_startup=t_bot_set_web_hook,
                            on_shutdown=t_bot_delete_web_hook)
+    logger.info('Bot has started working')

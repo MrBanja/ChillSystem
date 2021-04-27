@@ -44,23 +44,27 @@ settings = Settings()
 def create_logger(debug_status: bool) -> loguru.logger:
     """Create project loggers depending on debug status"""
     if debug_status:
-        logger.add(sink=sys.stderr,
-                   format='{time} | {level} | {exception} {file.path} {function} '
-                          'line:{line} {message}',
-                   enqueue=True,
-                   diagnose=True,
-                   catch=True,
-                   backtrace=True,
-                   filter=lambda record: record['extra'].get('name') == 'debug_logger',
-                   level='DEBUG')
+        logger.add(
+            sink=sys.stderr,
+            format='{time} | {level} | {exception} {file.path} {function} '
+                    'line:{line} {message}',
+            enqueue=True,
+            diagnose=True,
+            catch=True,
+            backtrace=True,
+            filter=lambda record: record['extra'].get('name') == 'debug_logger',
+            level='DEBUG'
+        )
         debug_logger = logger.bind(name='debug_logger')
         return debug_logger
 
-    logger.add(sink=sys.stderr,
-               format='{time} | {level} | {function} {message}',
-               enqueue=True,
-               level='INFO',
-               filter=lambda record: record['extra'].get('name') == 'production_logger')
+    logger.add(
+        sink=sys.stderr,
+        format='{time} | {level} | {function} {message}',
+        enqueue=True,
+        level='INFO',
+        filter=lambda record: record['extra'].get('name') == 'production_logger'
+    )
     production_logger = logger.bind(name='production_logger')
     return production_logger
 

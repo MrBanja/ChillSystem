@@ -1,21 +1,33 @@
 """Router for telegram bot handling."""
-import logging
 import json
+import logging
+
 import aio_pika
+import config
 from aiogram import (Bot,
                      types,
                      Dispatcher,
                      filters,
                      executor)
-import config
-from webhook_settings import t_bot_set_web_hook, t_bot_delete_web_hook
 from utilites.redis_util import create_redis_pool, Redis
-from dependencies import check_if_command_available
+
+from dependencies import check_if_command_available, create_a_reply_keyboard
+from webhook_settings import t_bot_set_web_hook, t_bot_delete_web_hook
 
 logger = logging.getLogger(__name__)
 
 bot = Bot(token=config.settings.telegram_bot_token)
 dp = Dispatcher(bot)
+
+
+@dp.message_handler(commands=['start'])
+async def t_bot_start_point(message: types.Message):
+    """Handle /start command and create a keyboard for user"""
+    logger.debug(f'User {message.from_user.id} has started working with bot')
+    commands = ['Skip', 'Clear', 'List']
+    keyboard = create_a_reply_keyboard(commands)
+    users_name = message.from_user['first_name']
+    await bot.send_message(message.chat.id, reply_markup=keyboard, text=f'Welcome {users_name}')
 
 
 @dp.message_handler(filters.Regexp(regexp=r'^(https://)?(www.)?(youtu.be|youtube.com)'))
@@ -41,7 +53,7 @@ async def t_bot_add_youtube_url_to_queue(message: types.Message):
         await message.answer(f'Nice video, bro! {res} videos in queue')
 
 
-@dp.message_handler(commands=['list'])
+@dp.message_handler(lambda message: message.text and 'list' in message.text.lower())
 async def t_bot_get_youtube_urls_from_queue(message: types.Message):
     """
     Handle `/list` bot command.
@@ -59,7 +71,7 @@ async def t_bot_get_youtube_urls_from_queue(message: types.Message):
         await message.answer(f'{resp}')
 
 
-@dp.message_handler(commands=['skip'])
+@dp.message_handler(lambda message: message.text and 'skip' in message.text.lower())
 async def t_bot_skip_video(message: types.Message):
     """
     Handle `/skip` bot command.
@@ -93,7 +105,7 @@ async def t_bot_skip_video(message: types.Message):
     logger.info('Send skip command to the worker.')
 
 
-@dp.message_handler(commands=['clear'])
+@dp.message_handler(lambda message: message.text and 'clear' in message.text.lower())
 async def t_bot_clear_youtube_urls_from_queue(message: types.Message):
     """
     Handle `/clear` bot command.
